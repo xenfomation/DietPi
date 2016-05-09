@@ -211,6 +211,7 @@
 	#Linux Software
 	INSTALL_LINUX_CHOICESMADE=false
 	VIMFULL=0
+	VIMTINY=0
 	SSHCLIENT=0
 	SMBCLIENT=0
 	GITCLIENT=0
@@ -354,6 +355,7 @@ BAIKAL $BAIKAL
 
 #Additional Linux Software
 VIMFULL $VIMFULL
+VIMTINY $VIMTINY
 SSHCLIENT $SSHCLIENT
 SMBCLIENT $SMBCLIENT
 
@@ -472,6 +474,7 @@ _EOF_
 
 		#Linux
 		VIMFULL=$(cat "$FP_INSTALLED_FILE" | grep -m1 'VIMFULL ' | awk '{print $2}')
+		VIMTINY=$(cat "$FP_INSTALLED_FILE" | grep -m1 'VIMFULL ' | awk '{print $2}')
 		SSHCLIENT=$(cat "$FP_INSTALLED_FILE" | grep -m1 'SSHCLIENT ' | awk '{print $2}')
 		SMBCLIENT=$(cat "$FP_INSTALLED_FILE" | grep -m1 'SMBCLIENT ' | awk '{print $2}')
 		GITCLIENT=$(cat "$FP_INSTALLED_FILE" | grep -m1 'GITCLIENT ' | awk '{print $2}')
@@ -2013,6 +2016,14 @@ _EOF_
 			AGI vim
 
 			VIMFULL=2
+		fi
+		
+		if (( $VIMTINY == 1 )); then
+			INSTALL_DESCRIPTION='Vim Tiny'
+			Banner_Installing
+			AGI vim-tiny
+			
+			VIMTINY=2
 		fi
 
 		if (( $SSHCLIENT == 1 )); then
@@ -6850,6 +6861,15 @@ _EOF_
 			fi
 		fi
 
+		local vimtiny_w="off"
+		if (( $VIMTINY > 0 )); then
+			vimtiny_w="on"
+			#Reset to 0. Menu checklists will apply back to 1
+			if (( $VIMTINY == 1 )); then
+				VIMTINY=0
+			fi
+		fi
+
 		local sshclient_w="off"
 		if (( $SSHCLIENT > 0 )); then
 			sshclient_w="on"
@@ -6953,6 +6973,7 @@ _EOF_
 		"Curlftpfs" "FTP Client: Allows filesystem mount." $curlftpfs_w \
 		"" "────Development / Programming────────────────" "off" \
 		"Vim" "Text editor: Console." $vimfull_w \
+		"Vim-Tiny" "Compact release of Vim." $vimtiny_w \
 		"Build" "Build-Essentials." $buildessential_w \
 		"Git" "Git Client." $gitclient_w \
 		"" "────Shared Libraries──────────────────────────" "off" \
@@ -6966,6 +6987,12 @@ _EOF_
 		while read choice
 		do
 			case $choice in
+				"Vim-Tiny")
+					if (( $VIMTINY == 0 )); then
+						VIMTINY=1
+						INSTALL_LINUX_CHOICESMADE=true
+					fi
+				;;
 				"Node.js")
 					if (( $NODEJS == 0 )); then
 						NODEJS=1
