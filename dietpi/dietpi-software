@@ -48,29 +48,6 @@
 	fi
 
 	#/////////////////////////////////////////////////////////////////////////////////////
-	#Check Internet Connection
-	#/////////////////////////////////////////////////////////////////////////////////////
-	INTERNET_CONNECTED=0
-	#Use /etc/apt/sources.list for connection test
-	INTERNET_URL_TEST=$(cat /etc/apt/sources.list | grep -m1 "deb http" | awk '{print $2}')
-
-	Check_Internet_Connection(){
-
-		INTERNET_CONNECTED=0
-		while (( $INTERNET_CONNECTED == 0 )); do
-
-			/DietPi/dietpi/func/check_connection "$INTERNET_URL_TEST"
-			if (( $? == 0 )); then
-				INTERNET_CONNECTED=1
-			else
-				Menu_No_Internet
-			fi
-
-		done
-
-	}
-
-	#/////////////////////////////////////////////////////////////////////////////////////
 	#Filepath
 	#/////////////////////////////////////////////////////////////////////////////////////
 	FP_INSTALLED_FILE="/DietPi/dietpi/.installed"
@@ -88,7 +65,95 @@
 	FOLDER_VIDEO='Video'
 	FOLDER_DOWNLOADS='downloads'
 
+	#/////////////////////////////////////////////////////////////////////////////////////
+	# Installation System Vars
+	#/////////////////////////////////////////////////////////////////////////////////////
+	#Run Instalation Flag (1 = run installs)
+	GOSTARTINSTALL=0
+	INSTALL_URL_ADDRESS=""
+	INSTALL_DESCRIPTION='DietPi'
+
+	#Special installation Vars
+	USER_EMONHUB_APIKEY_COMPLETED=0
+	USER_EMONHUB_APIKEY_CURRENT=0
+
+	#DietPi Software
+	INSTALL_DIETPI_CHOICESMADE=false
+
+	#Linux Software
+	INSTALL_LINUX_CHOICESMADE=false
+
+	#SSH Server Choices system
+	INSTALL_SSHSERVER_CHOICESMADE=false
+
+	#Fileserver Choices system
+	INSTALL_FILESERVER_CHOICESMADE=false
+
+	#Logging Choices system
+	INSTALL_LOGGING_CHOICESMADE=false
+
+	#/////////////////////////////////////////////////////////////////////////////////////
+	# First Run / Automation functions Vars (eg: on a fresh install)
+	#/////////////////////////////////////////////////////////////////////////////////////
+	AUTOINSTALL_INDEX=0
+
+	AUTOINSTALL_SKIPUSBDRIVEPROMPT=0
+	AUTOINSTALL_SKIPQUESTIONS=0
+	AUTOINSTALL_IGNOREERRORS=0
+
+	AUTOINSTALL_DEDICATEDUSBDRIVEFORMAT=0
+
+	AUTOINSTALL_SSHINDEX=0
+	AUTOINSTALL_FILESERVERINDEX=0
+	AUTOINSTALL_LOGGINGINDEX=0
+	AUTOINSTALL_WEBSERVERINDEX=0
+
+	AUTOINSTALL_AUTOSTARTTARGET=0
+
+	AUTOINSTALL_TIMEZONE=0
+	AUTOINSTALL_LANGUAGE=0
+	AUTOINSTALL_KEYBOARD=0
+
+	AUTOINSTALL_CUSTOMSCRIPTURL=0
+
+	#/////////////////////////////////////////////////////
+	# Error Vars
+	#/////////////////////////////////////////////////////
+	ERROR_TEXT=""
+
+	#/////////////////////////////////////////////////////////////////////////////////////
+	# WHIPTAIL MENU Vars
+	#/////////////////////////////////////////////////////////////////////////////////////
+	WHIP_BACKTITLE='DietPi-Software'
+	WHIP_TITLE=0
+	WHIP_QUESTION=0
+	MENU_MAIN_LASTITEM=""
+	TARGETMENUID=0
+
+	#/////////////////////////////////////////////////////////////////////////////////////
+	# Internet Connection Test Vars
+	#/////////////////////////////////////////////////////////////////////////////////////
+	INTERNET_CONNECTED=0
+	#Use /etc/apt/sources.list for connection test
+	INTERNET_URL_TEST=$(cat /etc/apt/sources.list | grep -m1 "deb http" | awk '{print $2}')
+
 	#Global funcs
+	Check_Internet_Connection(){
+
+		INTERNET_CONNECTED=0
+		while (( $INTERNET_CONNECTED == 0 )); do
+
+			/DietPi/dietpi/func/check_connection "$INTERNET_URL_TEST"
+			if (( $? == 0 )); then
+				INTERNET_CONNECTED=1
+			else
+				Menu_No_Internet
+			fi
+
+		done
+
+	}
+
 	Create_UserContent_Folders(){
 
 		mkdir -p "$TARGET_DIRECTORY"/"$FOLDER_MUSIC" &> /dev/null
@@ -120,137 +185,6 @@
 
 	}
 
-	#/////////////////////////////////////////////////////////////////////////////////////
-	# Installation System
-	#/////////////////////////////////////////////////////////////////////////////////////
-	#Run Instalation Flag (1 = run installs)
-	GOSTARTINSTALL=0
-	INSTALL_URL_ADDRESS=""
-	INSTALL_DESCRIPTION='DietPi'
-
-	#Special installation Vars
-	USER_EMONHUB_APIKEY_COMPLETED=0
-	USER_EMONHUB_APIKEY_CURRENT=0
-
-	#DietPi Software
-	INSTALL_DIETPI_CHOICESMADE=false
-
-	#Installed state # 0 = not installed / 1 = to be installed / 2 = installed
-	USBDRIVE=0
-	GRASSHOPPER=0
-	DESKTOP_LXDE=0
-
-	WEBSERVER_LAMP=0
-	WEBSERVER_LASP=0
-	WEBSERVER_LAAP=0
-
-	WEBSERVER_LEMP=0
-	WEBSERVER_LESP=0
-	WEBSERVER_LEAP=0
-
-	WEBSERVER_LLMP=0
-	WEBSERVER_LLSP=0
-	WEBSERVER_LLAP=0
-
-	WEBSERVER_APACHE=0
-	WEBSERVER_NGINX=0
-	WEBSERVER_LIGHTTPD=0
-	WEBSERVER_MYSQL=0
-	WEBSERVER_MARIADB=0
-	WEBSERVER_SQLITE=0
-	WEBSERVER_PHP=0
-	WEBSERVER_MYADMINPHP=0
-	WEBSERVER_REDIS=0
-
-	FILESERVER_PROFTP=0
-	FILESERVER_SAMBA=0
-	FILESERVER_VSFTPD=0
-
-	OWNCLOUD=0
-	TRANSMISSION=0
-	PHPBB=0
-	HIFI=0
-	KODI=0
-	MINIDLNA=0
-	NOIPDYNDNS=0
-	OPENTYRIAN=0
-	DIETPICAM=0
-	DELUGE=0
-	RASPCONTROL=0
-	LINUXDASH=0
-	PIHOLE=0
-	SUBSONIC=0
-	WEAVED=0
-	WEBIOPI=0
-	DIETPICLOUDSHELL=0
-	HAPROXY=0
-	SQUEEZEBOXSERVER=0
-	WORDPRESS=0
-	TIGHTVNCSERVER=0
-	FAIL2BAN=0
-	PHPSYSINFO=0
-	PHPIMAGEGALLERY=0
-	AMPACHE=0
-	OPENVPNSERVER=0
-	LETSENCRYPT=0
-	WIRINGPI=0
-	RPIGPIO=0
-	RPII2C=0
-	WIFIHOTSPOT=0
-	TORHOTSPOT=0
-	SHAIRPORTSYNC=0
-	BRUTEFIR=0
-	PYDIO=0
-	SQUEEZELITE=0
-	EMONCMS=0
-	EMONHUB=0
-	RPIMONITOR=0
-	NETDATA=0
-	BAIKAL=0
-
-	#Linux Software
-	INSTALL_LINUX_CHOICESMADE=false
-	VIMFULL=0
-	SSHCLIENT=0
-	SMBCLIENT=0
-	GITCLIENT=0
-	BUILDESSENTIAL=0
-	ALSABASE=0
-	XSERVERXORG=0
-	CURLFTPFS=0
-	FFMPEG=0
-	ORACLEJAVA=0
-	NODEJS=0
-	SSHSERVER_DROPBEAR=2
-	SSHSERVER_OPENSSH=0
-	LOGGING_LOGROTATE=0
-	LOGGING_RAMLOG=2
-	LOGGING_RSYSLOG=0
-
-	#SSH Server Choices system
-	INSTALL_SSHSERVER_CHOICESMADE=false
-	# 0=none -1=dropbear -2=openssh
-	INDEX_SSHSERVER_CURRENT=-1
-	INDEX_SSHSERVER_TARGET=-1
-
-	#Fileserver Choices system
-	INSTALL_FILESERVER_CHOICESMADE=false
-	# 0=none -1=proftp -2=samba -3=NOT ACTIVE (vsftpd)
-	INDEX_FILESERVER_CURRENT=0
-	INDEX_FILESERVER_TARGET=0
-
-	#Logging Choices system
-	INSTALL_LOGGING_CHOICESMADE=false
-	# 0=none -1=ramlog 24h clear -2=ramlog 1hour backup, clear -3=logrotate
-	INDEX_LOGGING_CURRENT=-1
-	INDEX_LOGGING_TARGET=-1
-
-	#Webserver base Preference System
-	# 0=Apache2 -1=Nginx -2=Lighttpd
-	INDEX_WEBSERVER_CURRENT=-2
-	INDEX_WEBSERVER_TARGET=-2
-
-
 	#apt-get install
 	AGI(){
 		local string="$@"
@@ -276,243 +210,141 @@
 
 		#Leave this until we have a SQL database to read from.
 
-		cat << _EOF_ > "$FP_INSTALLED_FILE"
+		local output="
 #DietPi External Drive
-USBDRIVE $USBDRIVE
+USBDRIVE=${USBDRIVE:=0}
 
 #DietPi Software
-GRASSHOPPER $GRASSHOPPER
-DESKTOP_LXDE $DESKTOP_LXDE
+GRASSHOPPER=${GRASSHOPPER:=0}
+DESKTOP_LXDE=${DESKTOP_LXDE:=0}
 
-WEBSERVER_LAMP $WEBSERVER_LAMP
-WEBSERVER_LASP $WEBSERVER_LASP
-WEBSERVER_LAAP $WEBSERVER_LAAP
+WEBSERVER_LAMP=${WEBSERVER_LAMP:=0}
+WEBSERVER_LASP=${WEBSERVER_LASP:=0}
+WEBSERVER_LAAP=${WEBSERVER_LAAP:=0}
 
-WEBSERVER_LEMP $WEBSERVER_LEMP
-WEBSERVER_LESP $WEBSERVER_LESP
-WEBSERVER_LEAP $WEBSERVER_LEAP
+WEBSERVER_LEMP=${WEBSERVER_LEMP:=0}
+WEBSERVER_LESP=${WEBSERVER_LESP:=0}
+WEBSERVER_LEAP=${WEBSERVER_LEAP:=0}
 
-WEBSERVER_LLMP $WEBSERVER_LLMP
-WEBSERVER_LLSP $WEBSERVER_LLSP
-WEBSERVER_LLAP $WEBSERVER_LLAP
+WEBSERVER_LLMP=${WEBSERVER_LLMP:=0}
+WEBSERVER_LLSP=${WEBSERVER_LLSP:=0}
+WEBSERVER_LLAP=${WEBSERVER_LLAP:=0}
 
-WEBSERVER_APACHE $WEBSERVER_APACHE
-WEBSERVER_NGINX $WEBSERVER_NGINX
-WEBSERVER_LIGHTTPD $WEBSERVER_LIGHTTPD
-WEBSERVER_MYSQL $WEBSERVER_MYSQL
-WEBSERVER_MARIADB $WEBSERVER_MARIADB
-WEBSERVER_SQLITE $WEBSERVER_SQLITE
-WEBSERVER_PHP $WEBSERVER_PHP
-WEBSERVER_MYADMINPHP $WEBSERVER_MYADMINPHP
-WEBSERVER_REDIS $WEBSERVER_REDIS
+WEBSERVER_APACHE=${WEBSERVER_APACHE:=0}
+WEBSERVER_NGINX=${WEBSERVER_NGINX:=0}
+WEBSERVER_LIGHTTPD=${WEBSERVER_LIGHTTPD:=0}
+WEBSERVER_MYSQL=${WEBSERVER_MYSQL:=0}
+WEBSERVER_MARIADB=${WEBSERVER_MARIADB:=0}
+WEBSERVER_SQLITE=${WEBSERVER_SQLITE:=0}
+WEBSERVER_PHP=${WEBSERVER_PHP:=0}
+WEBSERVER_MYADMINPHP=${WEBSERVER_MYADMINPHP:=0}
+WEBSERVER_REDIS=${WEBSERVER_REDIS:=0}
 
-OWNCLOUD $OWNCLOUD
-TRANSMISSION $TRANSMISSION
-PHPBB $PHPBB
-HIFI $HIFI
-KODI $KODI
-MINIDLNA $MINIDLNA
-NOIPDYNDNS $NOIPDYNDNS
-OPENTYRIAN $OPENTYRIAN
-DIETPICAM $DIETPICAM
-DELUGE $DELUGE
-FILESERVER_SAMBA $FILESERVER_SAMBA
-FILESERVER_PROFTP $FILESERVER_PROFTP
-FILESERVER_VSFTPD $FILESERVER_VSFTPD
-RASPCONTROL $RASPCONTROL
-LINUXDASH $LINUXDASH
-PIHOLE $PIHOLE
-SUBSONIC $SUBSONIC
-WEAVED $WEAVED
-WEBIOPI $WEBIOPI
-DIETPICLOUDSHELL $DIETPICLOUDSHELL
-HAPROXY $HAPROXY
-SQUEEZEBOXSERVER $SQUEEZEBOXSERVER
-WORDPRESS $WORDPRESS
-TIGHTVNCSERVER $TIGHTVNCSERVER
-FAIL2BAN $FAIL2BAN
-PHPSYSINFO $PHPSYSINFO
-PHPIMAGEGALLERY $PHPIMAGEGALLERY
-AMPACHE $AMPACHE
-OPENVPNSERVER $OPENVPNSERVER
-LETSENCRYPT $LETSENCRYPT
-WIRINGPI $WIRINGPI
-RPIGPIO $RPIGPIO
-RPII2C $RPII2C
-WIFIHOTSPOT $WIFIHOTSPOT
-TORHOTSPOT $TORHOTSPOT
-SHAIRPORTSYNC $SHAIRPORTSYNC
-BRUTEFIR $BRUTEFIR
-PYDIO $PYDIO
-SQUEEZELITE $SQUEEZELITE
-EMONHUB $EMONHUB
-EMONCMS $EMONCMS
-RPIMONITOR $RPIMONITOR
-NETDATA $NETDATA
-BAIKAL $BAIKAL
-
+OWNCLOUD=${OWNCLOUD:=0}
+TRANSMISSION=${TRANSMISSION:=0}
+PHPBB=${PHPBB:=0}
+HIFI=${HIFI:=0}
+KODI=${KODI:=0}
+MINIDLNA=${MINIDLNA:=0}
+NOIPDYNDNS=${NOIPDYNDNS:=0}
+OPENTYRIAN=${OPENTYRIAN:=0}
+DIETPICAM=${DIETPICAM:=0}
+DELUGE=${DELUGE:=0}
+FILESERVER_SAMBA=${FILESERVER_SAMBA:=0}
+FILESERVER_PROFTP=${FILESERVER_PROFTP:=0}
+FILESERVER_VSFTPD=${FILESERVER_VSFTPD:=0}
+RASPCONTROL=${RASPCONTROL:=0}
+LINUXDASH=${LINUXDASH:=0}
+PIHOLE=${PIHOLE:=0}
+SUBSONIC5=${SUBSONIC5:=0}
+SUBSONIC6=${SUBSONIC6:=0}
+WEAVED=${WEAVED:=0}
+WEBIOPI=${WEBIOPI:=0}
+DIETPICLOUDSHELL=${DIETPICLOUDSHELL:=0}
+HAPROXY=${HAPROXY:=0}
+SQUEEZEBOXSERVER=${SQUEEZEBOXSERVER:=0}
+WORDPRESS=${WORDPRESS:=0}
+TIGHTVNCSERVER=${TIGHTVNCSERVER:=0}
+FAIL2BAN=${FAIL2BAN:=0}
+PHPSYSINFO=${PHPSYSINFO:=0}
+PHPIMAGEGALLERY=${PHPIMAGEGALLERY:=0}
+AMPACHE=${AMPACHE:=0}
+OPENVPNSERVER=${OPENVPNSERVER:=0}
+LETSENCRYPT=${LETSENCRYPT:=0}
+WIRINGPI=${WIRINGPI:=0}
+RPIGPIO=${RPIGPIO:=0}
+RPII2C=${RPII2C:=0}
+WIFIHOTSPOT=${WIFIHOTSPOT:=0}
+TORHOTSPOT=${TORHOTSPOT:=0}
+SHAIRPORTSYNC=${SHAIRPORTSYNC:=0}
+BRUTEFIR=${BRUTEFIR:=0}
+PYDIO=${PYDIO:=0}
+SQUEEZELITE=${SQUEEZELITE:=0}
+EMONHUB=${EMONHUB:=0}
+EMONCMS=${EMONCMS:=0}
+RPIMONITOR=${RPIMONITOR:=0}
+NETDATA=${NETDATA:=0}
+BAIKAL=${BAIKAL:=0}
+MUMBLESERVER=${MUMBLESERVER:=0}
+EMBYSERVER=${EMBYSERVER:=0}
 
 #Additional Linux Software
-VIMFULL $VIMFULL
-SSHCLIENT $SSHCLIENT
-SMBCLIENT $SMBCLIENT
+VIMFULL=${VIMFULL:=0}
+VIMTINY=${VIMTINY:=0}
+GNUEMACS=${GNUEMACS:=0}
+SSHCLIENT=${SSHCLIENT:=0}
+SMBCLIENT=${SMBCLIENT:=0}
+MIDNIGHTCOMMANDER=${MIDNIGHTCOMMANDER:=0}
+JED=${JED:=0}
+IFTOP=${IFTOP:=0}
+IPTRAF=${IPTRAF:=0}
+IPERF=${IPERF:=0}
+MTRTINY=${MTRTINY:=0}
+NLOAD=${NLOAD:=0}
+TCPDUMP=${TCPDUMP:=0}
 
-GITCLIENT $GITCLIENT
-BUILDESSENTIAL $BUILDESSENTIAL
-ALSABASE $ALSABASE
-XSERVERXORG $XSERVERXORG
-CURLFTPFS $CURLFTPFS
-FFMPEG $FFMPEG
-ORACLEJAVA $ORACLEJAVA
-NODEJS $NODEJS
+GITCLIENT=${GITCLIENT:=0}
+BUILDESSENTIAL=${BUILDESSENTIAL:=0}
+ALSABASE=${ALSABASE:=0}
+XSERVERXORG=${XSERVERXORG:=0}
+CURLFTPFS=${CURLFTPFS:=0}
+FFMPEG=${FFMPEG:=0}
+ORACLEJAVA=${ORACLEJAVA:=0}
+NODEJS=${NODEJS:=0}
 
-SSHSERVER_DROPBEAR $SSHSERVER_DROPBEAR
-SSHSERVER_OPENSSH $SSHSERVER_OPENSSH
-LOGGING_LOGROTATE $LOGGING_LOGROTATE
-LOGGING_RAMLOG $LOGGING_RAMLOG
-LOGGING_RSYSLOG $LOGGING_RSYSLOG
+SSHSERVER_DROPBEAR=${SSHSERVER_DROPBEAR:=2}
+SSHSERVER_OPENSSH=${SSHSERVER_OPENSSH:=0}
+LOGGING_LOGROTATE=${LOGGING_LOGROTATE:=0}
+LOGGING_RAMLOG=${LOGGING_RAMLOG:=2}
+LOGGING_RSYSLOG=${LOGGING_RSYSLOG:=0}
 
 
 #DietPi Choice System: SSH Server
-INDEX_SSHSERVER_CURRENT $INDEX_SSHSERVER_CURRENT
-INDEX_SSHSERVER_TARGET $INDEX_SSHSERVER_TARGET
+INDEX_SSHSERVER_CURRENT=${INDEX_SSHSERVER_CURRENT:=-1}
+INDEX_SSHSERVER_TARGET=${INDEX_SSHSERVER_TARGET:=-1}
 
 #DietPi Choice System: File Server
-INDEX_FILESERVER_CURRENT $INDEX_FILESERVER_CURRENT
-INDEX_FILESERVER_TARGET $INDEX_FILESERVER_TARGET
+INDEX_FILESERVER_CURRENT=${INDEX_FILESERVER_CURRENT:=0}
+INDEX_FILESERVER_TARGET=${INDEX_FILESERVER_TARGET:=0}
 
 #DietPi Choice System: Logging
-INDEX_LOGGING_CURRENT $INDEX_LOGGING_CURRENT
-INDEX_LOGGING_TARGET $INDEX_LOGGING_TARGET
+INDEX_LOGGING_CURRENT=${INDEX_LOGGING_CURRENT:=-1}
+INDEX_LOGGING_TARGET=${INDEX_LOGGING_TARGET:=-1}
 
 #DietPi Preference System: Webserver base
-INDEX_WEBSERVER_CURRENT $INDEX_WEBSERVER_CURRENT
-INDEX_WEBSERVER_TARGET $INDEX_WEBSERVER_TARGET
+INDEX_WEBSERVER_CURRENT=${INDEX_WEBSERVER_CURRENT:=-2}
+INDEX_WEBSERVER_TARGET=${INDEX_WEBSERVER_TARGET:=-2}
 
-_EOF_
+"
 
+		echo "$output" > "$FP_INSTALLED_FILE"
 	}
 
 	Read_InstallFileList(){
 
-		FP_INSTALLED_FILE="/DietPi/dietpi/.installed"
-
-		#DietPi
-		USBDRIVE=$(cat "$FP_INSTALLED_FILE" | grep -m1 'USBDRIVE ' | awk '{print $2}')
-
-		GRASSHOPPER=$(cat "$FP_INSTALLED_FILE" | grep -m1 'GRASSHOPPER ' | awk '{print $2}')
-		DESKTOP_LXDE=$(cat "$FP_INSTALLED_FILE" | grep -m1 'DESKTOP_LXDE ' | awk '{print $2}')
-
-		WEBSERVER_LAMP=$(cat "$FP_INSTALLED_FILE" | grep -m1 'WEBSERVER_LAMP ' | awk '{print $2}')
-		WEBSERVER_LASP=$(cat "$FP_INSTALLED_FILE" | grep -m1 'WEBSERVER_LASP ' | awk '{print $2}')
-		WEBSERVER_LAAP=$(cat "$FP_INSTALLED_FILE" | grep -m1 'WEBSERVER_LAAP ' | awk '{print $2}')
-
-		WEBSERVER_LEMP=$(cat "$FP_INSTALLED_FILE" | grep -m1 'WEBSERVER_LEMP ' | awk '{print $2}')
-		WEBSERVER_LESP=$(cat "$FP_INSTALLED_FILE" | grep -m1 'WEBSERVER_LESP ' | awk '{print $2}')
-		WEBSERVER_LEAP=$(cat "$FP_INSTALLED_FILE" | grep -m1 'WEBSERVER_LEAP ' | awk '{print $2}')
-
-		WEBSERVER_LLMP=$(cat "$FP_INSTALLED_FILE" | grep -m1 'WEBSERVER_LLMP ' | awk '{print $2}')
-		WEBSERVER_LLSP=$(cat "$FP_INSTALLED_FILE" | grep -m1 'WEBSERVER_LLSP ' | awk '{print $2}')
-		WEBSERVER_LLAP=$(cat "$FP_INSTALLED_FILE" | grep -m1 'WEBSERVER_LLAP ' | awk '{print $2}')
-
-		WEBSERVER_APACHE=$(cat "$FP_INSTALLED_FILE" | grep -m1 'WEBSERVER_APACHE ' | awk '{print $2}')
-		WEBSERVER_NGINX=$(cat "$FP_INSTALLED_FILE" | grep -m1 'WEBSERVER_NGINX ' | awk '{print $2}')
-		WEBSERVER_LIGHTTPD=$(cat "$FP_INSTALLED_FILE" | grep -m1 'WEBSERVER_LIGHTTPD ' | awk '{print $2}')
-		WEBSERVER_MYSQL=$(cat "$FP_INSTALLED_FILE" | grep -m1 'WEBSERVER_MYSQL ' | awk '{print $2}')
-		WEBSERVER_MARIADB=$(cat "$FP_INSTALLED_FILE" | grep -m1 'WEBSERVER_MARIADB ' | awk '{print $2}')
-		WEBSERVER_SQLITE=$(cat "$FP_INSTALLED_FILE" | grep -m1 'WEBSERVER_SQLITE ' | awk '{print $2}')
-		WEBSERVER_PHP=$(cat "$FP_INSTALLED_FILE" | grep -m1 'WEBSERVER_PHP ' | awk '{print $2}')
-		WEBSERVER_MYADMINPHP=$(cat "$FP_INSTALLED_FILE" | grep -m1 'WEBSERVER_MYADMINPHP ' | awk '{print $2}')
-		WEBSERVER_REDIS=$(cat "$FP_INSTALLED_FILE" | grep -m1 'WEBSERVER_REDIS ' | awk '{print $2}')
-
-		FILESERVER_PROFTP=$(cat "$FP_INSTALLED_FILE" | grep -m1 'FILESERVER_PROFTP ' | awk '{print $2}')
-		FILESERVER_SAMBA=$(cat "$FP_INSTALLED_FILE" | grep -m1 'FILESERVER_SAMBA ' | awk '{print $2}')
-		FILESERVER_VSFTPD=$(cat "$FP_INSTALLED_FILE" | grep -m1 'FILESERVER_VSFTPD ' | awk '{print $2}')
-		OWNCLOUD=$(cat "$FP_INSTALLED_FILE" | grep -m1 'OWNCLOUD ' | awk '{print $2}')
-		TRANSMISSION=$(cat "$FP_INSTALLED_FILE" | grep -m1 'TRANSMISSION ' | awk '{print $2}')
-		PHPBB=$(cat "$FP_INSTALLED_FILE" | grep -m1 'PHPBB ' | awk '{print $2}')
-		KODI=$(cat "$FP_INSTALLED_FILE" | grep -m1 'KODI ' | awk '{print $2}')
-		MINIDLNA=$(cat "$FP_INSTALLED_FILE" | grep -m1 'MINIDLNA ' | awk '{print $2}')
-		NOIPDYNDNS=$(cat "$FP_INSTALLED_FILE" | grep -m1 'NOIPDYNDNS ' | awk '{print $2}')
-		HIFI=$(cat "$FP_INSTALLED_FILE" | grep -m1 'HIFI ' | awk '{print $2}')
-		OPENTYRIAN=$(cat "$FP_INSTALLED_FILE" | grep -m1 'OPENTYRIAN ' | awk '{print $2}')
-		DIETPICAM=$(cat "$FP_INSTALLED_FILE" | grep -m1 'DIETPICAM ' | awk '{print $2}')
-		DELUGE=$(cat "$FP_INSTALLED_FILE" | grep -m1 'DELUGE ' | awk '{print $2}')
-		RASPCONTROL=$(cat "$FP_INSTALLED_FILE" | grep -m1 'RASPCONTROL ' | awk '{print $2}')
-		LINUXDASH=$(cat "$FP_INSTALLED_FILE" | grep -m1 'LINUXDASH ' | awk '{print $2}')
-		PIHOLE=$(cat "$FP_INSTALLED_FILE" | grep -m1 'PIHOLE ' | awk '{print $2}')
-		SUBSONIC=$(cat "$FP_INSTALLED_FILE" | grep -m1 'SUBSONIC ' | awk '{print $2}')
-		WEAVED=$(cat "$FP_INSTALLED_FILE" | grep -m1 'WEAVED ' | awk '{print $2}')
-		WEBIOPI=$(cat "$FP_INSTALLED_FILE" | grep -m1 'WEBIOPI ' | awk '{print $2}')
-		DIETPICLOUDSHELL=$(cat "$FP_INSTALLED_FILE" | grep -m1 'DIETPICLOUDSHELL ' | awk '{print $2}')
-		HAPROXY=$(cat "$FP_INSTALLED_FILE" | grep -m1 'HAPROXY ' | awk '{print $2}')
-		SQUEEZEBOXSERVER=$(cat "$FP_INSTALLED_FILE" | grep -m1 'SQUEEZEBOXSERVER ' | awk '{print $2}')
-		WORDPRESS=$(cat "$FP_INSTALLED_FILE" | grep -m1 'WORDPRESS ' | awk '{print $2}')
-		TIGHTVNCSERVER=$(cat "$FP_INSTALLED_FILE" | grep -m1 'TIGHTVNCSERVER ' | awk '{print $2}')
-		FAIL2BAN=$(cat "$FP_INSTALLED_FILE" | grep -m1 'FAIL2BAN ' | awk '{print $2}')
-		PHPSYSINFO=$(cat "$FP_INSTALLED_FILE" | grep -m1 'PHPSYSINFO ' | awk '{print $2}')
-		PHPIMAGEGALLERY=$(cat "$FP_INSTALLED_FILE" | grep -m1 'PHPIMAGEGALLERY ' | awk '{print $2}')
-		AMPACHE=$(cat "$FP_INSTALLED_FILE" | grep -m1 'AMPACHE ' | awk '{print $2}')
-		OPENVPNSERVER=$(cat "$FP_INSTALLED_FILE" | grep -m1 'OPENVPNSERVER ' | awk '{print $2}')
-		LETSENCRYPT=$(cat "$FP_INSTALLED_FILE" | grep -m1 'LETSENCRYPT ' | awk '{print $2}')
-		WIRINGPI=$(cat "$FP_INSTALLED_FILE" | grep -m1 'WIRINGPI ' | awk '{print $2}')
-		RPIGPIO=$(cat "$FP_INSTALLED_FILE" | grep -m1 'RPIGPIO ' | awk '{print $2}')
-		RPII2C=$(cat "$FP_INSTALLED_FILE" | grep -m1 'RPII2C ' | awk '{print $2}')
-		WIFIHOTSPOT=$(cat "$FP_INSTALLED_FILE" | grep -m1 'WIFIHOTSPOT ' | awk '{print $2}')
-		TORHOTSPOT=$(cat "$FP_INSTALLED_FILE" | grep -m1 'TORHOTSPOT ' | awk '{print $2}')
-		SHAIRPORTSYNC=$(cat "$FP_INSTALLED_FILE" | grep -m1 'SHAIRPORTSYNC ' | awk '{print $2}')
-		BRUTEFIR=$(cat "$FP_INSTALLED_FILE" | grep -m1 'BRUTEFIR ' | awk '{print $2}')
-		PYDIO=$(cat "$FP_INSTALLED_FILE" | grep -m1 'PYDIO ' | awk '{print $2}')
-		SQUEEZELITE=$(cat "$FP_INSTALLED_FILE" | grep -m1 'SQUEEZELITE ' | awk '{print $2}')
-		EMONHUB=$(cat "$FP_INSTALLED_FILE" | grep -m1 'EMONHUB ' | awk '{print $2}')
-		EMONCMS=$(cat "$FP_INSTALLED_FILE" | grep -m1 'EMONCMS ' | awk '{print $2}')
-		RPIMONITOR=$(cat "$FP_INSTALLED_FILE" | grep -m1 'RPIMONITOR ' | awk '{print $2}')
-		NETDATA=$(sed -nr 's/^NETDATA\s+(.*)/\1/p' "$FP_INSTALLED_FILE")
-		BAIKAL=$(cat "$FP_INSTALLED_FILE" | grep -m1 'BAIKAL ' | awk '{print $2}')
-
-		#Linux
-		VIMFULL=$(cat "$FP_INSTALLED_FILE" | grep -m1 'VIMFULL ' | awk '{print $2}')
-		SSHCLIENT=$(cat "$FP_INSTALLED_FILE" | grep -m1 'SSHCLIENT ' | awk '{print $2}')
-		SMBCLIENT=$(cat "$FP_INSTALLED_FILE" | grep -m1 'SMBCLIENT ' | awk '{print $2}')
-		GITCLIENT=$(cat "$FP_INSTALLED_FILE" | grep -m1 'GITCLIENT ' | awk '{print $2}')
-		BUILDESSENTIAL=$(cat "$FP_INSTALLED_FILE" | grep -m1 'BUILDESSENTIAL ' | awk '{print $2}')
-		ALSABASE=$(cat "$FP_INSTALLED_FILE" | grep -m1 'ALSABASE ' | awk '{print $2}')
-		XSERVERXORG=$(cat "$FP_INSTALLED_FILE" | grep -m1 'XSERVERXORG ' | awk '{print $2}')
-		CURLFTPFS=$(cat "$FP_INSTALLED_FILE" | grep -m1 'CURLFTPFS ' | awk '{print $2}')
-		FFMPEG=$(cat "$FP_INSTALLED_FILE" | grep -m1 'FFMPEG ' | awk '{print $2}')
-		ORACLEJAVA=$(cat "$FP_INSTALLED_FILE" | grep -m1 'ORACLEJAVA ' | awk '{print $2}')
-		NODEJS=$(cat "$FP_INSTALLED_FILE" | grep -m1 'NODEJS ' | awk '{print $2}')
-
-		SSHSERVER_DROPBEAR=$(cat "$FP_INSTALLED_FILE" | grep -m1 'SSHSERVER_DROPBEAR ' | awk '{print $2}')
-		SSHSERVER_OPENSSH=$(cat "$FP_INSTALLED_FILE" | grep -m1 'SSHSERVER_OPENSSH ' | awk '{print $2}')
-		LOGGING_LOGROTATE=$(cat "$FP_INSTALLED_FILE" | grep -m1 'LOGGING_LOGROTATE ' | awk '{print $2}')
-		LOGGING_RAMLOG=$(cat "$FP_INSTALLED_FILE" | grep -m1 'LOGGING_RAMLOG ' | awk '{print $2}')
-		LOGGING_RSYSLOG=$(cat "$FP_INSTALLED_FILE" | grep -m1 'LOGGING_RSYSLOG ' | awk '{print $2}')
-
-		#SSH Server Choices
-		INDEX_SSHSERVER_CURRENT=$(cat "$FP_INSTALLED_FILE" | grep -m1 'INDEX_SSHSERVER_CURRENT ' | awk '{print $2}')
-		INDEX_SSHSERVER_TARGET=$(cat "$FP_INSTALLED_FILE" | grep -m1 'INDEX_SSHSERVER_TARGET ' | awk '{print $2}')
-
-		#Fileserver Software Choices
-		INDEX_FILESERVER_CURRENT=$(cat "$FP_INSTALLED_FILE" | grep -m1 'INDEX_FILESERVER_CURRENT ' | awk '{print $2}')
-		INDEX_FILESERVER_TARGET=$(cat "$FP_INSTALLED_FILE" | grep -m1 'INDEX_FILESERVER_TARGET ' | awk '{print $2}')
-
-		#Logging Choices
-		INDEX_LOGGING_CURRENT=$(cat "$FP_INSTALLED_FILE" | grep -m1 'INDEX_LOGGING_CURRENT ' | awk '{print $2}')
-		INDEX_LOGGING_TARGET=$(cat "$FP_INSTALLED_FILE" | grep -m1 'INDEX_LOGGING_TARGET ' | awk '{print $2}')
-
-		#Webserver Preference
-		INDEX_WEBSERVER_CURRENT=$(cat "$FP_INSTALLED_FILE" | grep -m1 'INDEX_WEBSERVER_CURRENT ' | awk '{print $2}')
-		INDEX_WEBSERVER_TARGET=$(cat "$FP_INSTALLED_FILE" | grep -m1 'INDEX_WEBSERVER_TARGET ' | awk '{print $2}')
-
-		#Take note of the extra space used at the end of each grep quote 'MYSOFTWARE '
-		#This ensures packages with similar names (eg: WEBSERVER_PHP and WEBSERVER_MYADMINPHP) dont both get picked up.
-
-		#Additions must be added to patch file, if /DietPi/dietpi/.installed exists on host system!
-		#eg
-		#	if [ -f /DietPi/dietpi/.installed ]; then
-		#		#echo -e "SUDO_AUTH 0" >> /DietPi/dietpi/.installed
-		#	fi
+		if [[ -f "$FP_INSTALLED_FILE" ]]; then
+			. "$FP_INSTALLED_FILE"
+		fi
 
 	}
 
@@ -576,7 +408,7 @@ _EOF_
 		fi
 
 		# - Installs that require a MySQL stack:  WEBSERVER_L?[MA]P
-		if (( $OWNCLOUD || $PHPBB || $WORDPRESS || $AMPACHE || $PYDIO || $EMONCMS || $BAIKAL )); then
+		if (( $OWNCLOUD || $PHPBB || $WORDPRESS || $AMPACHE || $PYDIO || $EMONCMS || $BAIKAL || $WEBSERVER_MYADMINPHP )); then
 
 			# - Check for existing installations
 			if (( ! $WEBSERVER_LAMP && ! $WEBSERVER_LAAP && \
@@ -1038,7 +870,10 @@ _EOF_
 			#x32 x64
 			if (( $HW_MODEL == 20 )); then
 				INSTALL_URL_ADDRESS="http://dietpi.com/downloads/binaries/all/noip_x32_x64.zip"
-			#ARM
+			#arm64
+			elif (( $HW_MODEL == 12 )); then
+				INSTALL_URL_ADDRESS="http://dietpi.com/downloads/binaries/all/noip_arm64.zip"
+			#armv6+
 			else
 				INSTALL_URL_ADDRESS="http://dietpi.com/downloads/binaries/all/noip_armhf.zip"
 			fi
@@ -1282,9 +1117,9 @@ _EOF_
 
 		fi
 
-		#SUBSONIC
-		if (( $SUBSONIC == 1 )); then
-			INSTALL_DESCRIPTION='SubSonic (Web interface media streamer)'
+		#SUBSONIC 5
+		if (( $SUBSONIC5 == 1 )); then
+			INSTALL_DESCRIPTION='SubSonic 5 (Web interface media streamer)'
 			Banner_Installing
 
 			INSTALL_URL_ADDRESS='http://sourceforge.net/projects/subsonic/files/subsonic/5.3/subsonic-5.3.deb/download'
@@ -1300,10 +1135,33 @@ _EOF_
 
 			else
 				Error_NoConnection_NoInstall
-				SUBSONIC=0
+				SUBSONIC5=0
 			fi
 
 		fi
+
+		if (( $SUBSONIC6 == 1 )); then
+                        INSTALL_DESCRIPTION='SubSonic 6 (Web interface media streamer)'
+                        Banner_Installing
+
+                        INSTALL_URL_ADDRESS='https://sourceforge.net/projects/subsonic/files/subsonic/6.0/subsonic-6.0.deb/download'
+                        /DietPi/dietpi/func/check_connection "$INSTALL_URL_ADDRESS"
+                        if (( $? == 0 )); then
+
+                                AGI lame
+
+                                #Install SubSonic 6.0
+                                wget "$INSTALL_URL_ADDRESS" -O package.deb
+                                dpkg -i package.deb
+                                rm package.deb
+
+                        else
+                                Error_NoConnection_NoInstall
+                                SUBSONIC6=0
+                        fi
+
+                fi
+
 
 		#WEAVED
 		if (( $WEAVED == 1 )); then
@@ -1709,7 +1567,14 @@ _EOF_
 			Banner_Installing
 
 			#check source is online
+			# - NB: These are hostapd binaries with RTL drivers enabled.
+			# - armv6
 			INSTALL_URL_ADDRESS='http://dietpi.com/downloads/binaries/all/hostapd_14128.zip'
+			# - arm64
+			if (( $HW_MODEL == 12 )); then
+				INSTALL_URL_ADDRESS='http://dietpi.com/downloads/binaries/all/hostapd_2.5-arm64.zip'
+			fi
+
 			/DietPi/dietpi/func/check_connection "$INSTALL_URL_ADDRESS"
 
 			#Install
@@ -1718,10 +1583,13 @@ _EOF_
 				# - Prereqs
 				AGI hostapd isc-dhcp-server iptables
 
-				wget "$INSTALL_URL_ADDRESS" -O package.zip
-				unzip -o package.zip -d /usr/sbin
-				rm package.zip
-				chmod +x /usr/sbin/hostapd
+				# - For all devices, excluding RPi 3 inbuilt wifi, Install modified hostapd binary with RTL drivers enabled.
+				if (( $HW_MODEL != 3 )); then
+					wget "$INSTALL_URL_ADDRESS" -O package.zip
+					unzip -o package.zip -d /usr/sbin
+					rm package.zip
+					chmod +x /usr/sbin/hostapd
+				fi
 
 			else
 				Error_NoConnection_NoInstall
@@ -2000,6 +1868,65 @@ _EOF_
 
 		fi
 
+		#MUMBLESERVER
+		if (( $MUMBLESERVER == 1 )); then
+			INSTALL_DESCRIPTION='Murmur - Mumble VoIP Server'
+			Banner_Installing
+
+			AGI mumble-server
+
+		fi
+
+		#EMBYSERVER
+		if (( $EMBYSERVER == 1 )); then
+			INSTALL_DESCRIPTION='Emby Server'
+			Banner_Installing
+
+			local url_tests=0
+
+			#check is online
+			INSTALL_URL_ADDRESS='http://download.opensuse.org/repositories/home:/emby/Debian_8.0'
+			/DietPi/dietpi/func/check_connection "$INSTALL_URL_ADDRESS"
+
+			if (( $? == 0 )); then
+
+				INSTALL_URL_ADDRESS='http://download.mono-project.com/repo/debian'
+				/DietPi/dietpi/func/check_connection "$INSTALL_URL_ADDRESS"
+
+				if (( $? == 0 )); then
+
+					url_tests=1
+
+				fi
+
+			fi
+
+			#install
+			if (( $url_tests == 1 )); then
+
+				# - Alternative mono repo: https://github.com/Fourdee/DietPi/issues/310#issuecomment-216247879
+				apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF
+				echo -e "deb http://download.mono-project.com/repo/debian wheezy main" > /etc/apt/sources.list.d/mono-xamarin.list
+				echo -e "deb http://download.mono-project.com/repo/debian wheezy-libjpeg62-compat main" >> /etc/apt/sources.list.d/mono-xamarin.list
+
+
+				# - Emby repo
+				wget http://download.opensuse.org/repositories/home:emby/Debian_8.0/Release.key
+				apt-key add - < Release.key
+				echo -e "deb http://download.opensuse.org/repositories/home:/emby/Debian_8.0/ /" > /etc/apt/sources.list.d/emby-server.list
+				apt-get update
+
+				AGI emby-server
+
+			else
+				Error_NoConnection_NoInstall
+
+				#Abort failed install
+				EMBYSERVER=0
+			fi
+
+		fi
+
 	}
 
 	Install_Linux_Software(){
@@ -2014,6 +1941,78 @@ _EOF_
 
 			VIMFULL=2
 		fi
+
+		if (( $VIMTINY == 1 )); then
+			INSTALL_DESCRIPTION='Vim Tiny'
+			Banner_Installing
+			AGI vim-tiny
+
+			VIMTINY=2
+		fi
+
+                if (( $GNUEMACS == 1 )); then
+                        INSTALL_DESCRIPTION='Emacs'
+                        Banner_Installing
+                        AGI emacs
+
+                        GNUEMACS=2
+                fi
+
+                if (( $MIDNIGHTCOMMANDER == 1 )); then
+                        INSTALL_DESCRIPTION='Midnight Commander'
+                        Banner_Installing
+                        AGI mc
+
+                        MIDNIGHTCOMMANDER=2
+                fi
+
+                if (( $JED == 1 )); then
+                        INSTALL_DESCRIPTION='Jed Text Editor'
+                        Banner_Installing
+                        AGI jed
+
+                        JED=2
+                fi
+
+                if (( $IFTOP == 1 )); then
+                        INSTALL_DESCRIPTION='iftop'
+                        Banner_Installing
+                        AGI iftop
+
+                        IFTOP=2
+                fi
+
+                if (( $IPTRAF == 1 )); then
+                        INSTALL_DESCRIPTION='IPTraf'
+                        Banner_Installing
+                        AGI iptraf
+
+                        IPTRAF=2
+                fi
+
+                if (( $MTRTINY == 1 )); then
+                        INSTALL_DESCRIPTION='MTR-Tiny'
+                        Banner_Installing
+                        AGI mtr-tiny
+
+                        MTR-TINY=2
+                fi
+
+                if (( $NLOAD == 1 )); then
+                        INSTALL_DESCRIPTION='nLoad'
+                        Banner_Installing
+                        AGI nload
+
+                        NLOAD=2
+                fi
+
+                if (( $TCPDUMP == 1 )); then
+                        INSTALL_DESCRIPTION='TCPDUMP'
+                        Banner_Installing
+                        AGI tcpdump
+
+                        TCPDUMP=2
+                fi
 
 		if (( $SSHCLIENT == 1 )); then
 			INSTALL_DESCRIPTION='OpenSSH Client'
@@ -2076,7 +2075,9 @@ _EOF_
 			ALSABASE=1
 		elif (( $OPENTYRIAN == 1 )); then
 			ALSABASE=1
-		elif (( $SUBSONIC == 1 )); then
+		elif (( $SUBSONIC5 == 1 )); then
+			ALSABASE=1
+		elif (( $SUBSONIC6 == 1 )); then
 			ALSABASE=1
 		elif (( $TIGHTVNCSERVER == 1 )); then
 			ALSABASE=1
@@ -2295,7 +2296,9 @@ _EOF_
 		fi
 
 		#Software that requires ffmpeg
-		if (( $SUBSONIC == 1 )); then
+		if (( $SUBSONIC5 == 1 )); then
+			FFMPEG=1
+		elif (( $SUBSONIC6 == 1 )); then
 			FFMPEG=1
 		elif (( $AMPACHE == 1 )); then
 			FFMPEG=1
@@ -2360,7 +2363,9 @@ _EOF_
 
 		#ORACLEJAVA
 		# - Software that requires JRE/JDK
-		if (( $SUBSONIC == 1 )); then
+		if (( $SUBSONIC5 == 1 )); then
+			ORACLEJAVA=1
+		elif (( $SUBSONIC6 == 1 )); then
 			ORACLEJAVA=1
 		fi
 
@@ -2384,6 +2389,9 @@ _EOF_
 
 				apt-key adv --keyserver keyserver.ubuntu.com --recv-keys EEA14886
 				apt-get update
+
+				# - Accept the license: https://github.com/Fourdee/DietPi/issues/298
+				debconf-set-selections <<< "oracle-java8-installer shared/accepted-oracle-license-v1-1 boolean true"
 
 				AGI oracle-java8-installer
 
@@ -3501,8 +3509,8 @@ _EOF_
 			PIHOLE=2
 		fi
 
-		#SUBSONIC
-		if (( $SUBSONIC == 1 )); then
+		#SUBSONIC 5
+		if (( $SUBSONIC5 == 1 )); then
 
 			#Generate user dir
 			Create_UserContent_Folders
@@ -3534,9 +3542,47 @@ _EOF_
 			fi
 
 
-			SUBSONIC=2
+			SUBSONIC5=2
 
 		fi
+
+                #SUBSONIC 6
+                if (( $SUBSONIC6 == 1 )); then
+
+                        #Generate user dir
+                        Create_UserContent_Folders
+
+                        #Optimize memory limit
+                        local subsonic_memory_max=$(( $(free -m -o | grep -m1 'Mem:' | awk '{print $2}') / 5 ))
+                        #Minimum cap 150mb
+                        if (( $subsonic_memory_max < 150 )); then
+                                subsonic_memory_max=150
+                        fi
+
+                        cat << _EOF_ > /etc/default/subsonic
+SUBSONIC_USER=root
+SUBSONIC_ARGS="--quiet --pidfile=/run/subsonic.pid --max-memory=$subsonic_memory_max --default-music-folder=$TARGET_DIRECTORY/$FOLDER_MUSIC --default-podcast-folder=$TARGET_DIRECTORY/$FOLDER_MUSIC --default-playlist-folder=$TARGET_DIRECTORY/$FOLDER_MUSIC"
+_EOF_
+
+                        #Grab our test media for user
+                        Download_Test_Media
+
+                        #Symlink ffmpeg to subsonic transcoder
+                        #rpi armv6 jessie (using compiled ffmpeg)
+                        if (( $HW_MODEL < 2 )) &&
+                                (( $DISTRO == 3 )); then
+                                ln -fs /usr/local/bin/ffmpeg /var/subsonic/transcode
+
+                        #ARMv7
+                        else
+                                ln -fs /usr/bin/ffmpeg /var/subsonic/transcode
+                        fi
+
+
+                        SUBSONIC6=2
+
+                fi
+
 
 		#RPIGPIO
 		if (( $RPIGPIO == 1 )); then
@@ -3975,10 +4021,10 @@ INTERFACES="wlan$wifi_index"
 _EOF_
 
 			# - Remove all entries below wlan, so we can recreate them.
-			sed -i '/auto wlan/q0' /etc/network/interfaces
+			sed -i '/allow-hotplug wlan/q0' /etc/network/interfaces
 
 			# - enable up wlan
-			sed -i "/auto wlan/c\auto wlan$wifi_index" /etc/network/interfaces
+			sed -i "/allow-hotplug wlan/c\allow-hotplug wlan$wifi_index" /etc/network/interfaces
 
 			# - Add wifi settings to network interfaces config
 			cat << _EOF_ >> /etc/network/interfaces
@@ -4038,11 +4084,11 @@ _EOF_
 
 			#RPi 3 - WiFi hotspot. Internal Wifi fix.
 			# - Disable driver definition
-			# - Use non-modified hostapd binary from Jessie repo.
 			if (( $HW_MODEL == 3 )); then
-				apt-get remove hostapd -y
-				apt-get install hostapd -y
-				sed -i '/driver=/c\#driver=rtl871xdrv/' /etc/hostapd/hostapd.conf
+				sed -i '/driver=/c\#driver=none' /etc/hostapd/hostapd.conf
+
+				# - Add Wireless N support
+				echo -e "ieee80211n=1" >> /etc/hostapd/hostapd.conf
 			fi
 
 
@@ -4356,6 +4402,32 @@ _EOF_
 
 		fi
 
+		#MUMBLESERVER
+		if (( $MUMBLESERVER == 1 )); then
+
+			#Cap total connections
+			sed -i '/users=/c\users=40' /etc/mumble-server.ini
+			# - RPI 1
+			if (( $HW_MODEL <= 1 )); then
+				sed -i '/users=/c\users=8' /etc/mumble-server.ini
+			fi
+
+			#Name the root channel
+			sed -i '/registerName=/c\registerName=DietPi Mumble Server' /etc/mumble-server.ini
+
+			#Disable DB logging
+			sed -i '/logdays=/c\logdays=-1' /etc/mumble-server.ini
+
+			MUMBLESERVER=2
+
+		fi
+
+		#EMBYSERVER
+		if (( $EMBYSERVER == 1 )); then
+
+			EMBYSERVER=2
+
+		fi
 
 	}
 
@@ -4675,31 +4747,6 @@ _EOF_
 
 	}
 
-	#/////////////////////////////////////////////////////////////////////////////////////
-	# First Run / Automation functions (eg: on a fresh install)
-	#/////////////////////////////////////////////////////////////////////////////////////
-
-	AUTOINSTALL_INDEX=0
-
-	AUTOINSTALL_SKIPUSBDRIVEPROMPT=0
-	AUTOINSTALL_SKIPQUESTIONS=0
-	AUTOINSTALL_IGNOREERRORS=0
-
-	AUTOINSTALL_DEDICATEDUSBDRIVEFORMAT=0
-
-	AUTOINSTALL_SSHINDEX=0
-	AUTOINSTALL_FILESERVERINDEX=0
-	AUTOINSTALL_LOGGINGINDEX=0
-	AUTOINSTALL_WEBSERVERINDEX=0
-
-	AUTOINSTALL_AUTOSTARTTARGET=0
-
-	AUTOINSTALL_TIMEZONE=0
-	AUTOINSTALL_LANGUAGE=0
-	AUTOINSTALL_KEYBOARD=0
-
-	AUTOINSTALL_CUSTOMSCRIPTURL=0
-
 	FirstRun_Automation(){
 
 		#Get settings
@@ -4766,12 +4813,12 @@ _EOF_
 					Write_InstallFileList
 
 					#Obtain the .installed names of all software which has been selected for install
-					cat /DietPi/dietpi.txt | grep '^AUTO_DietpiSoftware_Install' | grep '=1' | sed 's/AUTO_DietpiSoftware_Install_//' | sed 's/=.*//' > /tmp/.dietpi-software_autoinstall_choices
+					cat /DietPi/dietpi.txt | grep '^AUTO_DietpiSoftware_Install' | grep '=1' | sed 's/AUTO_DietpiSoftware_Install_//' | sed 's/1.*//' > /tmp/.dietpi-software_autoinstall_choices
 					while read line
 					do
 
 						#Update.installed file and set to 1 (to be installed)
-						sed -i "/^$line /c $line 1" "$FP_INSTALLED_FILE"
+						sed -i "/^$line/c $line\1" "$FP_INSTALLED_FILE"
 
 					done < /tmp/.dietpi-software_autoinstall_choices
 					rm /tmp/.dietpi-software_autoinstall_choices
@@ -4893,6 +4940,8 @@ _EOF_
 			CHOICE=$?
 			if (( $CHOICE == 0 )); then
 
+				# XENFOMATION: Place holder to wrap up 2 USB dedicated drives
+
 				#Run external drive setup script
 				/DietPi/dietpi/dietpi-external_drive_setup
 
@@ -4912,10 +4961,8 @@ _EOF_
 	}
 
 	#/////////////////////////////////////////////////////////////////////////////////////
-	# Errors
+	# Error Functions
 	#/////////////////////////////////////////////////////////////////////////////////////
-	ERROR_TEXT=""
-
 	Error_Display(){
 
 		#Automation | Save to logfile if errors are being ignored
@@ -4946,14 +4993,8 @@ _EOF_
 	}
 
 	#/////////////////////////////////////////////////////////////////////////////////////
-	# WHIPTAIL MENUS
+	# WHIPTAIL MENU Functions
 	#/////////////////////////////////////////////////////////////////////////////////////
-	WHIP_BACKTITLE='DietPi-Software'
-	WHIP_TITLE=0
-	WHIP_QUESTION=0
-	MENU_MAIN_LASTITEM=""
-	TARGETMENUID=0
-
 	Menu_No_Internet(){
 
 		#Ask to check settings,
@@ -5680,12 +5721,12 @@ _EOF_
 			fi
 		fi
 
-		local subsonic_w="off"
-		if (( $SUBSONIC > 0 )); then
-			subsonic_w="on"
+		local subsonic5_w="off"
+		if (( $SUBSONIC5 > 0 )); then
+			subsonic5_w="on"
 			#Reset to 0. Menu checklists will apply back to 1
-			if (( $SUBSONIC == 1 )); then
-				SUBSONIC=0
+			if (( $SUBSONIC5 == 1 )); then
+				SUBSONIC5=0
 			fi
 		fi
 
@@ -5918,6 +5959,37 @@ _EOF_
 			fi
 		fi
 
+		#MUMBLESERVER
+		local mumbleserver_w="off"
+		if (( $MUMBLESERVER > 0 )); then
+			mumbleserver_w="on"
+			#Reset to 0.  Menu checklists will apply back to 1
+			if (( $MUMBLESERVER == 1 )); then
+				MUMBLESERVER=0
+			fi
+		fi
+
+		#EMBYSERVER
+		local embyserver_w="off"
+		if (( $EMBYSERVER > 0 )); then
+			embyserver_w="on"
+			#Reset to 0.  Menu checklists will apply back to 1
+			if (( $EMBYSERVER == 1 )); then
+				EMBYSERVER=0
+			fi
+		fi
+
+		#SUBSONIC 6.0
+		local subsonic6_w="off"
+		if (( $SUBSONIC6 > 0 )); then
+			subsonic6_w="on"
+			#Reset to 0.  Menu checklists will apply back to 1
+			if (( $SUBSONIC6 == 1 )); then
+				SUBSONIC6=0
+			fi
+		fi
+
+
 		#-----------------------------------------------------------------------------
 		WHIP_TITLE='DietPi Optimized Software Selection'
 
@@ -5931,9 +6003,11 @@ _EOF_
 			"" "────Media Systems───────────────────────────" "off" \
 			"HiFi" "Web interface music / radio player." $hifi_w \
 			"MiniDLNA" "Media streaming server (DLNA, UPnP)." $minidlna_w \
-			"SubSonic" "Web interface media streaming server." $subsonic_w \
+			"SubSonic 5" "Web interface media streaming server." $subsonic5_w \
+			"SubSonic 6" "(NEW) Web interface media streaming server." $subsonic6_w \
 			"Ampache" "Web interface media streaming server." $ampache_w \
 			"Shairport Sync" "AirPlay audio player with multiroom sync" $shairportsync_w \
+			"Murmur" "Mumble VoIP server." $mumbleserver_w \
 			"" "────BitTorrent──────────────────────────────" "off" \
 			"Transmission" "BitTorrent server with web interface." $transmission_w \
 			"Deluge" "BitTorrent server with web interface." $deluge_w \
@@ -5988,8 +6062,11 @@ _EOF_
 			"LXDE: VNC Server" "LXDE Desktop for remote connection." $tightvncserver_w \
 			"" "────Media Systems──────────────────────────" "off" \
 			"MiniDLNA" "Media streaming server (DLNA, UPnP)." $minidlna_w \
-			"SubSonic" "Web interface media streaming server." $subsonic_w \
+			"SubSonic 5" "Web interface media streaming server." $subsonic5_w \
+			"SubSonic 6" "(NEW) Web interface media streaming server." $subsonic6_w \
 			"Ampache" "Web interface media streaming server." $ampache_w \
+			"Murmur" "Mumble VoIP server." $mumbleserver_w \
+			"Emby Server" "Web interface media streaming server." $embyserver_w \
 			"" "────BitTorrent─────────────────────────────" "off" \
 			"Transmission" "BitTorrent server with web interface." $transmission_w \
 			"Deluge" "BitTorrent server with web interface." $deluge_w \
@@ -6042,9 +6119,12 @@ _EOF_
 			"" "────Media Systems───────────────────────────" "off" \
 			"Kodi" "Your very own media centre / player." $kodi_w \
 			"MiniDLNA" "Media streaming server (DLNA, UPnP)." $minidlna_w \
-			"SubSonic" "Web interface media streaming server." $subsonic_w \
+			"SubSonic 5" "Web interface media streaming server." $subsonic5_w \
+			"SubSonic 6" "(NEW) Web interface media streaming server." $subsonic6_w \
 			"Ampache" "Web interface media streaming server." $ampache_w \
 			"Shairport Sync" "AirPlay audio player with multiroom sync" $shairportsync_w \
+			"Murmur" "Mumble VoIP server." $mumbleserver_w \
+			"Emby Server" "Web interface media streaming server." $embyserver_w \
 			"" "────BitTorrent──────────────────────────────" "off" \
 			"Transmission" "BitTorrent server with web interface." $transmission_w \
 			"Deluge" "BitTorrent server with web interface." $deluge_w \
@@ -6108,12 +6188,15 @@ _EOF_
 				"Kodi" "Your very own media centre / player." $kodi_w \
 				"HiFi" "Web interface music / radio player." $hifi_w \
 				"MiniDLNA" "Media streaming server (DLNA, UPnP)." $minidlna_w \
-				"SubSonic" "Web interface media streaming server." $subsonic_w \
+				"SubSonic 5" "Web interface media streaming server." $subsonic5_w \
+				"SubSonic 6" "(NEW) Web interface media streaming server." $subsonic6_w \
 				"SqueezeBox" "Logitech Media Server (LMS)." $squeezeboxserver_w \
 				"SqueezeLite" "Audio player for LMS" $squeezelite_w \
 				"Ampache" "Web interface media streaming server." $ampache_w \
 				"Shairport Sync" "AirPlay audio player with multiroom sync" $shairportsync_w \
 				"BruteFIR" "EQ and Digital Room Correction via ALSA." $brutefir_w \
+				"Murmur" "Mumble VoIP server." $mumbleserver_w \
+				"Emby Server" "Web interface media streaming server." $embyserver_w \
 				"" "────BitTorrent──────────────────────────────" "off" \
 				"Transmission" "BitTorrent server with web interface." $transmission_w \
 				"Deluge" "BitTorrent server with web interface." $deluge_w \
@@ -6187,7 +6270,8 @@ _EOF_
 				"Kodi" "Your very own media centre / player." $kodi_w \
 				"HiFi" "Web interface music / radio player." $hifi_w \
 				"MiniDLNA" "Media streaming server (DLNA, UPnP)." $minidlna_w \
-				"SubSonic" "Web interface media streaming server." $subsonic_w \
+				"SubSonic 5" "Web interface media streaming server." $subsonic5_w \
+				"SubSonic 6" "(NEW) Web interface media streaming server." $subsonic6_w \
 				"SqueezeBox" "Logitech Media Server (LMS)." $squeezeboxserver_w \
 				"Ampache" "Web interface media streaming server." $ampache_w \
 				"" "────BitTorrent──────────────────────────────" "off" \
@@ -6244,7 +6328,6 @@ _EOF_
 
 		fi
 
-
 		#disabled options
 		# "EmonCMS" "Web interface for Open Energy Monitor data" $emoncms_w \
 
@@ -6252,83 +6335,94 @@ _EOF_
 		do
 			case $choice in
 
+			"Emby Server")
+				if (( $EMBYSERVER == 0 )); then
+					EMBYSERVER=1
+					INSTALL_DIETPI_CHOICESMADE=true
+				fi
+			;;
+			Murmur)
+				if (( $MUMBLESERVER == 0 )); then
+					MUMBLESERVER=1
+					INSTALL_DIETPI_CHOICESMADE=true
+				fi
+			;;
 			"Tor Hotspot")
 				if (( $TORHOTSPOT == 0 )); then
 					TORHOTSPOT=1
-					INSTALL_LINUX_CHOICESMADE=true
+					INSTALL_DIETPI_CHOICESMADE=true
 				fi
 			;;
-
 			BaiKal)
 				if (( $BAIKAL == 0 )); then
 					BAIKAL=1
-					INSTALL_LINUX_CHOICESMADE=true
+					INSTALL_DIETPI_CHOICESMADE=true
 				fi
 			;;
 			"RPi-Monitor")
 				if (( $RPIMONITOR == 0 )); then
 					RPIMONITOR=1
-					INSTALL_LINUX_CHOICESMADE=true
+					INSTALL_DIETPI_CHOICESMADE=true
 				fi
 			;;
 			EmonHUB|EmonPi)
 				if (( $EMONHUB == 0 )); then
 					EMONHUB=1
-					INSTALL_LINUX_CHOICESMADE=true
+					INSTALL_DIETPI_CHOICESMADE=true
 				fi
 			;;
 			EmonCMS)
 				if (( $EMONCMS == 0 )); then
 					EMONCMS=1
-					INSTALL_LINUX_CHOICESMADE=true
+					INSTALL_DIETPI_CHOICESMADE=true
 				fi
 			;;
 			Redis)
 				if (( $WEBSERVER_REDIS == 0 )); then
 					WEBSERVER_REDIS=1
-					INSTALL_LINUX_CHOICESMADE=true
+					INSTALL_DIETPI_CHOICESMADE=true
 				fi
 			;;
 			SqueezeLite)
 				if (( $SQUEEZELITE == 0 )); then
 					SQUEEZELITE=1
-					INSTALL_LINUX_CHOICESMADE=true
+					INSTALL_DIETPI_CHOICESMADE=true
 				fi
 			;;
 			Pydio)
 				if (( $PYDIO == 0 )); then
 					PYDIO=1
-					INSTALL_LINUX_CHOICESMADE=true
+					INSTALL_DIETPI_CHOICESMADE=true
 				fi
 			;;
 			BruteFIR)
 				if (( $BRUTEFIR == 0 )); then
 					BRUTEFIR=1
-					INSTALL_LINUX_CHOICESMADE=true
+					INSTALL_DIETPI_CHOICESMADE=true
 				fi
 			;;
 			"Shairport Sync")
 				if (( $SHAIRPORTSYNC == 0 )); then
 					SHAIRPORTSYNC=1
-					INSTALL_LINUX_CHOICESMADE=true
+					INSTALL_DIETPI_CHOICESMADE=true
 				fi
 			;;
 			"WiFi Hotspot")
 				if (( $WIFIHOTSPOT == 0 )); then
 					WIFIHOTSPOT=1
-					INSTALL_LINUX_CHOICESMADE=true
+					INSTALL_DIETPI_CHOICESMADE=true
 				fi
 			;;
 			RPi.GPIO)
 				if (( $RPIGPIO == 0 )); then
 					RPIGPIO=1
-					INSTALL_LINUX_CHOICESMADE=true
+					INSTALL_DIETPI_CHOICESMADE=true
 				fi
 			;;
 			I2c)
 				if (( $RPII2C == 0 )); then
 					RPII2C=1
-					INSTALL_LINUX_CHOICESMADE=true
+					INSTALL_DIETPI_CHOICESMADE=true
 				fi
 			;;
 			WiringPi)
@@ -6415,9 +6509,15 @@ _EOF_
 					INSTALL_DIETPI_CHOICESMADE=true
 				fi
 			;;
-			SubSonic)
-				if (( $SUBSONIC == 0 )); then
-					SUBSONIC=1
+			"SubSonic 6")
+                               	if (( $SUBSONIC6 == 0 )); then
+                                        SUBSONIC6=1
+                                        INSTALL_DIETPI_CHOICESMADE=true
+                                fi
+                        ;;
+			"SubSonic 5")
+				if (( $SUBSONIC5 == 0 )); then
+					SUBSONIC5=1
 					INSTALL_DIETPI_CHOICESMADE=true
 				fi
 			;;
@@ -6768,7 +6868,7 @@ _EOF_
 				/DietPi/dietpi/dietpi-config 16 1
 
 				#DietPi-Config will change .installed file, so reload new value into var
-				NOIPDYNDNS=$(cat "$FP_INSTALLED_FILE" | grep -m1 'NOIPDYNDNS ' | awk '{print $2}')
+				. "$FP_INSTALLED_FILE"
 
 			fi
 		fi
@@ -6788,7 +6888,9 @@ _EOF_
 				inform_user_fileserver=1
 			elif (( $SQUEEZEBOXSERVER == 1 )); then
 				inform_user_fileserver=1
-			elif (( $SUBSONIC == 1 )); then
+			elif (( $SUBSONIC5 == 1 )); then
+				inform_user_fileserver=1
+			elif (( $SUBSONIC6 == 1 )); then
 				inform_user_fileserver=1
 			elif (( $AMPACHE == 1 )); then
 				inform_user_fileserver=1
@@ -6849,6 +6951,96 @@ _EOF_
 				VIMFULL=0
 			fi
 		fi
+
+		local vimtiny_w="off"
+                if (( $VIMTINY > 0 )); then
+                        vimtiny_w="on"
+                        #Reset to 0. Menu checklists will apply back to 1
+                        if (( $VIMTINY == 1 )); then
+                                VIMTINY=0
+                        fi
+                fi
+
+                local gnuemacs_w="off"
+                if (( $GNUEMACS > 0 )); then
+                        gnuemacs_w="on"
+                        #Reset to 0. Menu checklists will apply back to 1
+                        if (( $GNUEMACS == 1 )); then
+                                GNUEMACS=0
+                        fi
+                fi
+
+                local jed_w="off"
+                if (( $JED > 0 )); then
+                        jed_w="on"
+                        #Reset to 0. Menu checklists will apply back to 1
+                        if (( $JED == 1 )); then
+                                JED=0
+                        fi
+                fi
+
+                local midnightcommander_w="off"
+                if (( $MIDNIGHTCOMMANDER > 0 )); then
+                        midnightcommander_w="on"
+                        #Reset to 0. Menu checklists will apply back to 1
+                        if (( $MIDNIGHTCOMMANDER == 1 )); then
+                                MIDNIGHTCOMMANDER=0
+                        fi
+                fi
+
+                local iftop_w="off"
+                if (( $IFTOP > 0 )); then
+                        iftop_w="on"
+                        #Reset to 0. Menu checklists will apply back to 1
+                        if (( $IFTOP == 1 )); then
+                                IFTOP=0
+                        fi
+                fi
+
+                local iptraf_w="off"
+                if (( $IPTRAF > 0 )); then
+                        iptraf_w="on"
+                        #Reset to 0. Menu checklists will apply back to 1
+                        if (( $IPTRAF == 1 )); then
+                                IPTRAF=0
+                        fi
+                fi
+
+                local iperf_w="off"
+                if (( $IPERF > 0 )); then
+                        iperf_w="on"
+                        #Reset to 0. Menu checklists will apply back to 1
+                        if (( $IPERF == 1 )); then
+                                IPERF=0
+                        fi
+                fi
+
+                local mtrtiny_w="off"
+                if (( $MTRTINY > 0 )); then
+                        mtrtiny_w="on"
+                        #Reset to 0. Menu checklists will apply back to 1
+                        if (( $MTRTINY == 1 )); then
+                                MTRTINY=0
+                        fi
+                fi
+
+                local nload_w="off"
+                if (( $NLOAD > 0 )); then
+                        nload_w="on"
+                        #Reset to 0. Menu checklists will apply back to 1
+                        if (( $NLOAD == 1 )); then
+                                NLOAD=0
+                        fi
+                fi
+
+                local tcpdump_w="off"
+                if (( $TCPDUMP > 0 )); then
+                        tcpdump_w="on"
+                        #Reset to 0. Menu checklists will apply back to 1
+                        if (( $TCPDUMP == 1 )); then
+                                TCPDUMP=0
+                        fi
+                fi
 
 		local sshclient_w="off"
 		if (( $SSHCLIENT > 0 )); then
@@ -6944,17 +7136,31 @@ _EOF_
 			fi
 		fi
 
+
 		WHIP_TITLE='Linux - Software Selection'
 		whiptail --title "$WHIP_TITLE" --checklist --separate-output "Press the spacebar to select additional software for installation." --backtitle "$WHIP_BACKTITLE" 19 71 12 \
+		"" "────Editors──────────────────────────────────" "off" \
+		"Emacs" "GNU Emacs editor." $gnuemacs_w \
+		"Jed" "Editor for programmers." $jed_w \
+		"Vim" "Vi Enhanced Text Editor." $vimfull_w \
+		"Vim-Tiny" "Compact release of Vim." $vimtiny_w \
+		"" "────File Managers────────────────────────────" "off" \
+		"MC" "Midnight Commander - a powerful file manager." $midnightcommander_w \
 		"" "────SSH Clients──────────────────────────────" "off" \
 		"OpenSSH" "SSH Client: OpenSSH." $sshclient_w \
 		"" "────Fileserver Clients───────────────────────" "off" \
 		"Samba" "Samba Client: Access Network Shares." $smbclient_w \
 		"Curlftpfs" "FTP Client: Allows filesystem mount." $curlftpfs_w \
 		"" "────Development / Programming────────────────" "off" \
-		"Vim" "Text editor: Console." $vimfull_w \
 		"Build" "Build-Essentials." $buildessential_w \
 		"Git" "Git Client." $gitclient_w \
+		"" "────Network Tools─────────────────────────────" "off" \
+		"iftop" "Displays bandwidth usage information." $iftop_w \
+		"IPTraf" "Interactive Colorful IP LAN Monitor." $iptraf_w \
+		"Iperf" "Internet Protocol bandwidth measuring tool." $iperf_w \
+		"MTR-Tiny" "Full screen ncurses traceroute tool." $mtrtiny_w \
+		"nLoad" "Realtime console network usage monitor." $nload_w \
+		"tcpdump" "Command-line network traffic analyzer." $tcpdump_w \
 		"" "────Shared Libraries──────────────────────────" "off" \
 		"FFmpeg" "Audio / Visual libary." $ffmpeg_w \
 		"Java" "Oracle Java 8 jdk/jre libary." $oraclejava_w \
@@ -6966,9 +7172,45 @@ _EOF_
 		while read choice
 		do
 			case $choice in
+				Iperf)
+					if (( $IPERF == 0 )); then
+						IPERF=1
+						INSTALL_LINUX_CHOICESMADE=true
+					fi
+				;;
+				IPTraf)
+					if (( $IPTRAF == 0 )); then
+						IPTRAF=1
+						INSTALL_LINUX_CHOICESMADE=true
+					fi
+				;;
+				"MTR-Tiny")
+					if (( $MTRTINY == 0 )); then
+						MTRTINY=1
+						INSTALL_LINUX_CHOICESMADE=true
+					fi
+				;;
+				nLoad)
+					if (( $NLOAD == 0 )); then
+						NLOAD=1
+						INSTALL_LINUX_CHOICESMADE=true
+					fi
+				;;
+				tcpdump)
+					if (( $TCPDUMP == 0 )); then
+						TCPDUMP=1
+						INSTALL_LINUX_CHOICESMADE=true
+					fi
+				;;
 				"Node.js")
 					if (( $NODEJS == 0 )); then
 						NODEJS=1
+						INSTALL_LINUX_CHOICESMADE=true
+					fi
+				;;
+				MC)
+					if (( $MIDNIGHTCOMMANDER == 0 )); then
+						MIDNIGHTCOMMANDER=1
 						INSTALL_LINUX_CHOICESMADE=true
 					fi
 				;;
@@ -6984,9 +7226,27 @@ _EOF_
 						INSTALL_LINUX_CHOICESMADE=true
 					fi
 				;;
+				Emacs)
+					if (( $GNUEMACS == 0 )); then
+						GNUEMACS=1
+						INSTALL_LINUX_CHOICESMADE=true
+					fi
+				;;
+				Jed)
+					if (( $JED == 0 )); then
+						JED=1
+						INSTALL_LINUX_CHOICESMADE=true
+					fi
+				;;
 				Vim)
 					if (( $VIMFULL == 0 )); then
 						VIMFULL=1
+						INSTALL_LINUX_CHOICESMADE=true
+					fi
+				;;
+				"Vim-Tiny")
+					if (( $VIMTINY == 0 )); then
+						VIMTINY=1
 						INSTALL_LINUX_CHOICESMADE=true
 					fi
 				;;
@@ -7049,8 +7309,7 @@ _EOF_
 				/DietPi/dietpi/dietpi-config 16 1
 
 				#DietPi-Config will change .installed file, so reload new value into var
-				CURLFTPFS=$(cat "$FP_INSTALLED_FILE" | grep -m1 'CURLFTPFS ' | awk '{print $2}')
-
+				. "$FP_INSTALLED_FILE"
 			fi
 		fi
 
@@ -7065,7 +7324,7 @@ _EOF_
 				/DietPi/dietpi/dietpi-config 16 1
 
 				#DietPi-Config will change .installed file, so reload new value into var
-				SMBCLIENT=$(cat "$FP_INSTALLED_FILE" | grep -m1 'SMBCLIENT ' | awk '{print $2}')
+				. "$FP_INSTALLED_FILE"
 			fi
 		fi
 		#-----------------------------------------------------------------------------
@@ -7076,7 +7335,6 @@ _EOF_
 	#/////////////////////////////////////////////////////////////////////////////////////
 	# Banner Print
 	#/////////////////////////////////////////////////////////////////////////////////////
-
 	Banner_Setup(){
 		/DietPi/dietpi/dietpi-banner 0
 		echo -e "\n DietPi-Software \n"
@@ -7140,13 +7398,11 @@ _EOF_
 	clear
 
 	#--------------------------------------------------------------------------------------
-	#Generate blank .installed file. Doesnt exist on a fresh image.
-	if [ ! -f "$FP_INSTALLED_FILE" ]; then
-		Write_InstallFileList
-	#load .installed file, update vars
-	else
-		Read_InstallFileList
-	fi
+	#load .installed file, update vars, if it exists
+	Read_InstallFileList
+
+	#Generate blank .installed file if it doesnt exist on a fresh image or update with current values.
+	Write_InstallFileList
 
 	#--------------------------------------------------------------------------------------
 	#DietPi-Software, 1st run.
@@ -7201,3 +7457,4 @@ _EOF_
 	exit
 	#-----------------------------------------------------------------------------------
 }
+
